@@ -24,7 +24,7 @@ def login():
             flash("Account does not exist under that email.", category='error')
 
 
-    return render_template("login.html", boolean=True)
+    return render_template("login.html", user = current_user)
 
 
 
@@ -73,4 +73,4 @@ def sign_up():
 
     
     
-    return render_template("sign_up.html")
+    return render_template("sign_up.html", user = current_user)
