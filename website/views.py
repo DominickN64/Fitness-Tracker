@@ -39,3 +39,11 @@ def delete_note():
 
     return jsonify({})
 
+@views.route("/settings")
+def settings():
+
+    
+    return render_template("settings.html", user = current_user)
+
+#@views.route("/deleteAllNotes")
+

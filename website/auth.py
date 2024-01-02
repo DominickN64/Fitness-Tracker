@@ -74,3 +74,18 @@ def sign_up():
     
     
     return render_template("sign_up.html", user = current_user)
+
+
+@auth.route("/settings/changePassword", methods = [ "POST"])
+def changePassword():
+    if request.method == "POST":
+        password = request.form["changedPassword"]
+        if len(password) < 1:
+            flash("Please enter a password")
+        else:
+            hashed_password = generate_password_hash(password, method='scrypt')
+            current_user.password =hashed_password
+            db.session.commit()
+
+            flash('Password changed successfully!')
+        return redirect(url_for('views.settings'))

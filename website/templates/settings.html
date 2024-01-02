@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{%block title%}Settings{%endblock%}
+
+{%block content %}
+
+<div align="center" style="padding-top: 10px;">
+Reset Password
+</div>
+<form method = "POST" action="/settings/changePassword">
+    <br>
+    
+        <input
+        type = "password" class="form-control" id="password" name="password" placeholder="Enter New Password Here"/>
+    <br>
+    <div align="center">
+    <button type = "submit" class="btn btn-primary">Change Password</button>
+    </div>
+    </form>
+<!----
+<div align = "center" style="padding-top: 40px;">
+Reset Account by Erasing All Notes
+<form method = "POST">
+    <br>
+    <div align="center">
+    <button type = "submit" class="btn btn-primary">Reset</button>
+    </div>
+    </form>
+</div>
+--->
+
+{%endblock%}
