@@ -79,7 +79,7 @@ def sign_up():
 @auth.route("/settings/changePassword", methods = [ "POST"])
 def changePassword():
     if request.method == "POST":
-        password = request.form["changedPassword"]
+        password = request.form.get("password")
         if len(password) < 1:
             flash("Please enter a password")
         else:
