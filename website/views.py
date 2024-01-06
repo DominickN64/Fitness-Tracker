@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import  login_required, current_user
 from .models import Note
 from . import db
@@ -47,4 +47,16 @@ def settings():
     return render_template("settings.html", user = current_user)
 
 #@views.route("/deleteAllNotes")
+
+@views.route("/settings/resetAccount",methods=['POST'])
+def resetAccount():
+
+    for note in current_user.notes:
+        db.session.delete(note)
+        db.session.commit()
+        
+    flash("Account Sucessfully Reset")
+
+    return redirect(url_for('views.settings'))
+
 
