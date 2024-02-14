@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import  login_required, current_user
-from .models import Note
+from .models import Note,User
 from . import db
 import json
 
@@ -58,5 +58,35 @@ def resetAccount():
     flash("Account Sucessfully Reset")
 
     return redirect(url_for('views.settings'))
+
+
+
+
+@views.route('/data')
+
+def get_data():
+    
+    users= User.query.all()
+    user_data = []
+
+    for user in users:
+        user_notes = [note.data for note in user.notes]
+        user_data.append({
+        'email': user.email,
+        'notes': user_notes
+
+        })
+
+    
+    
+
+    
+    
+    return (jsonify(user_data))
+        
+         
+            
+        
+        
 
 
