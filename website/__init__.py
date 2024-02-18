@@ -1,21 +1,25 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from os import path
+from pymongo import MongoClient
+import os
 from flask_login import LoginManager
+import certifi
+
+MONGO_URI = os.getenv("MONGO_URI")
+
+ca_cert_path = certifi.where()
+
+cluster = MongoClient(MONGO_URI,tlsCAFile=ca_cert_path)
+
+db = cluster["FitnessApp"]
+collection = db["UserInfo"]
 
 
-
-db = SQLAlchemy()
-DB_NAME = "database.db"
 
 def create_app():
+
     app = Flask(__name__)
     app.config['SECRET_KEY'] = "abcdefg"
 
-
-
-    app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{DB_NAME}'
-    db.init_app(app)
 
 
     from .views import views
@@ -25,9 +29,9 @@ def create_app():
     app.register_blueprint(auth, url_prefix = "/")
 
 
-    from .models import User, Note
+    from .models import User
 
-    create_database(app)
+    
 
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
@@ -35,15 +39,11 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(id):
-        return User.query.get(int(id))
+        return User(id) 
 
 
     return app
 
-def create_database(app):
-    if not path.exists('website/' + DB_NAME):
-        with app.app_context():
-            db.create_all()
-        print('Created Database!')
+
 
 

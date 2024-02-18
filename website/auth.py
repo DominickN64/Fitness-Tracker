@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db
+from . import collection
+from bson import ObjectId
 from flask_login import login_user, login_required, logout_user, current_user
 
 auth = Blueprint("auth", __name__)
@@ -12,9 +13,12 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        user = User.query.filter_by(email=email).first()
-        if user:
-            if check_password_hash(user.password, password):
+        userdata = collection.find_one({"email":email})
+        
+        
+        if userdata:
+            user = User(str(userdata["_id"]))
+            if check_password_hash(userdata["password"], password):
                 login_user(user, remember=True)
                 flash('Logged in successfully', category='success')
                 return redirect(url_for('views.home'))
@@ -22,6 +26,7 @@ def login():
                 flash("Incorrect password, try again", category='error')
         else:
             flash("Account does not exist under that email.", category='error')
+            
 
 
     return render_template("login.html", user = current_user)
@@ -47,7 +52,7 @@ def sign_up():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
         
-        user = User.query.filter_by(email=email).first()
+        user = collection.find_one({"email":email})
         if user:
             flash("Account with that email already exists", category="error")
 
@@ -62,10 +67,17 @@ def sign_up():
         elif password1 != password2:
             flash("Passwords don't match", category="error")
         else:
-            new_user = User(email=email, firstName = firstName, password = generate_password_hash(password1, method='scrypt'))
-            db.session.add(new_user)
-            db.session.commit()
+            
+            result = collection.insert_one({
+            "email":email,
+            "firstName":firstName,
+            "password":generate_password_hash(password1, method='scrypt'),
+            "notes":[]
+            })
+            
 
+            
+            new_user = User(str(result.inserted_id))
             flash("Account created", category="success")
             login_user(new_user, remember=True)
             return redirect(url_for("views.home"))
@@ -84,8 +96,10 @@ def changePassword():
             flash("Please enter a password")
         else:
             hashed_password = generate_password_hash(password, method='scrypt')
-            current_user.password =hashed_password
-            db.session.commit()
+            collection.update_one(
+            {"_id": ObjectId(current_user.get_id())},
+            {"$set": {"password": hashed_password}})
+            
 
             flash('Password changed successfully!')
         return redirect(url_for('views.settings'))

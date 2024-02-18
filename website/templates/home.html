@@ -6,9 +6,9 @@
    
 <h1 align="center" style="padding-top: 20px;">Workout Log</h1>
 <ul class = "list-group list-group-flush" id = "notes">
-{%for note in user.notes%}
-<li class = "list-group-item"><div style="text-align:center">{{note.date}}</div><br>{{note.data}}<br>
-    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+{%for item in notes%}
+<li class = "list-group-item"><div style="text-align:center">{{item.date}}</div><br>{{item.note}}<br>
+   <button type="button" class="close" onClick="deleteNote('{{ item.note }}', '{{ item.date}}')">
         <span aria-hidden="true">&times;</span>
       </button>
 </li>

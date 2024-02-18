@@ -1,8 +1,11 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import  login_required, current_user
-from .models import Note,User
-from . import db
+from .models import User
+from . import collection
 import json
+from bson import ObjectId
+from datetime import datetime
+
 
 
 
@@ -11,7 +14,7 @@ views = Blueprint("views", __name__)
 @views.route("/", methods = ["GET","POST"])
 @login_required
 def home():
-
+    
     if request.method == "POST":
         note = request.form.get("note")
 
@@ -19,24 +22,33 @@ def home():
             flash("Note is too short",category = "error")
 
         else:
-            new_note = Note(data = note, user_id = current_user.id )
-            db.session.add(new_note)
-            db.session.commit()
+            userID = current_user.get_id()
+            current_datetime = datetime.now().strftime("%m/%d/%Y")
+            collection.update_one(
+            {'_id': ObjectId(userID)},
+            {'$push': {'notes': {'note': note, 'date': current_datetime}}})
+
+            
+            
+
             flash("Lift added",category = "success")
         
     
 
-    return render_template("home.html", user=current_user)
+    return render_template("home.html", user=current_user, notes = collection.find_one({"_id": ObjectId(current_user.get_id())})['notes'])
 
 @views.route('/delete-note', methods=['POST'])
-def delete_note():  
-    note = json.loads(request.data)  
-    noteId = note['noteId']
-    note = Note.query.get(noteId)
-    if note:
-        if note.user_id == current_user.id:
-            db.session.delete(note)
-            db.session.commit()
+def delete_note():
+    
+  
+    data = json.loads(request.data)  
+    note = data['note']
+    date = data['date']
+
+    if data:
+        collection.update_one(
+        {'_id': ObjectId(current_user.get_id())},
+        {'$pull': {'notes': {'note': note, 'date': date}}})
 
     return jsonify({})
 
@@ -46,14 +58,15 @@ def settings():
     
     return render_template("settings.html", user = current_user)
 
-#@views.route("/deleteAllNotes")
+
 
 @views.route("/settings/resetAccount",methods=['POST'])
 def resetAccount():
 
-    for note in current_user.notes:
-        db.session.delete(note)
-        db.session.commit()
+    collection.update_one(
+        {'_id': ObjectId(current_user.get_id())},  
+        {'$set': {'notes': []}}  
+    )
         
     flash("Account Sucessfully Reset")
 
@@ -66,23 +79,13 @@ def resetAccount():
 
 def get_data():
     
-    users= User.query.all()
-    user_data = []
+    users= list(collection.find())
+    
 
     for user in users:
-        user_notes = [note.data for note in user.notes]
-        user_data.append({
-        'email': user.email,
-        'notes': user_notes
-
-        })
-
+        user['_id'] = str(user['_id'])
     
-    
-
-    
-    
-    return (jsonify(user_data))
+    return (jsonify(users))
         
          
             
