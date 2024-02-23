@@ -91,10 +91,17 @@ def get_data():
 
 
 
-@views.route("/progressTracker")
+'''@views.route("/progressTracker")
 def Tracker():
     user = current_user.get_id()
-    pass
+    userdata = collection.find_one({"notes":int})
+    max = 0
+    for note in notes:
+        if note > max:
+            max = int(note)
+        
+    
+    pass'''
     
             
         
