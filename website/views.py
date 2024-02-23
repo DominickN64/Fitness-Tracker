@@ -32,6 +32,8 @@ def home():
             
 
             flash("Lift added",category = "success")
+
+            
         
     
 
@@ -76,7 +78,6 @@ def resetAccount():
 
 
 @views.route('/data')
-
 def get_data():
     
     users= list(collection.find())
@@ -86,8 +87,22 @@ def get_data():
         user['_id'] = str(user['_id'])
     
     return (jsonify(users))
+
+
+
+
+'''@views.route("/progressTracker")
+def Tracker():
+    user = current_user.get_id()
+    userdata = collection.find_one({"notes":int})
+    max = 0
+    for note in notes:
+        if note > max:
+            max = int(note)
         
-         
+    
+    pass'''
+    
             
         
         
