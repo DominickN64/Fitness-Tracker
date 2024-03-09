@@ -2,23 +2,25 @@ from flask import Flask
 from pymongo import MongoClient
 import os
 from flask_login import LoginManager
-import certifi
-
-MONGO_URI = os.getenv("MONGO_URI")
-
-ca_cert_path = certifi.where()
-
-cluster = MongoClient(MONGO_URI,tlsCAFile=ca_cert_path)
-
-db = cluster["FitnessApp"]
-collection = db["UserInfo"]
+from .database import init_db
 
 
 
-def create_app():
+
+
+
+def create_app(test_config=None):
+    
+     
+        
+
 
     app = Flask(__name__)
     app.config['SECRET_KEY'] = "abcdefg"
+    
+    app.config['TESTING'] = test_config is not None
+
+    init_db(app)
 
 
 

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import  login_required, current_user
 from .models import User
-from . import collection
+from .database import collection
 import json
 from bson import ObjectId
 from datetime import datetime
@@ -91,17 +91,7 @@ def get_data():
 
 
 
-'''@views.route("/progressTracker")
-def Tracker():
-    user = current_user.get_id()
-    userdata = collection.find_one({"notes":int})
-    max = 0
-    for note in notes:
-        if note > max:
-            max = int(note)
-        
-    
-    pass'''
+
     
             
         
