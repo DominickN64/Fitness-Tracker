@@ -19,8 +19,14 @@ jobs:
     - name: Run Tests in Docker Container
       run: docker run my-flask-app pytest
 
-    - name: Push to Docker Registry
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    - name: Log in to Docker Hub
       run: |
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-        docker push my-flask-app
+
+    - name: Tag Docker image
+      run: |
+        docker tag my-flask-app domn64/fitness-trkr-bknd:latest
+
+    - name: Push to Docker Hub
+      run: |
+        docker push domn64/fitness-trkr-bknd:latest
