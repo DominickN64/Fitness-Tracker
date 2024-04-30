@@ -17,7 +17,7 @@ jobs:
       run: docker build -t my-flask-app .
 
     - name: Run Tests in Docker Container
-      run: docker run my-flask-app python -m unittest discover
+      run: docker run my-flask-app pytest
 
     - name: Push to Docker Registry
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
